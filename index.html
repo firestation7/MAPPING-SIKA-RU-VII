@@ -1089,5 +1089,34 @@
           });
       });
     </script>
+  <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+      import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBjCqc9YIgBFauo1H1C-iRF6bZheP-ED2U",
+        authDomain: "sika-ru-vii-f2197.firebaseapp.com",
+        projectId: "sika-ru-vii-f2197",
+        storageBucket: "sika-ru-vii-f2197.firebasestorage.app",
+        messagingSenderId: "495089368297",
+        appId: "1:495089368297:web:f76f2f64ea50711e81c478"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      console.log("Firebase sukses terhubung ke peta!");
+
+      onSnapshot(collection(db, "peta_sika"), (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                  const dataBaru = change.doc.data();
+                  L.marker([dataBaru.latitude, dataBaru.longitude])
+                   .addTo(map) 
+                   .bindPopup(`<b>${dataBaru.nama}</b>`);
+              }
+          });
+      });
+    </script>
 </body>
 </html>
