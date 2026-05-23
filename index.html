@@ -1,3 +1,27 @@
+// 1. Baris bawaan Firebase (Dari gambar Anda)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+
+// 2. TAMBAHKAN BARIS INI (Wajib untuk mengaktifkan fitur database & real-time)
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+// 3. Konfigurasi proyek sika-ru-vii Anda
+const firebaseConfig = {
+  apiKey: "AIzaSyBjCqc9YIgBFauo1H1C-iRF6bZheP-ED2U",
+  authDomain: "sika-ru-vii-f2197.firebaseapp.com",
+  projectId: "sika-ru-vii-f2197",
+  storageBucket: "sika-ru-vii-f2197.firebasestorage.app",
+  messagingSenderId: "495089368297",
+  appId: "1:495089368297:web:f76f2f64ea50711e81c478",
+  measurementId: "G-KKZPN406KY"
+};
+
+// 4. Inisialisasi Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+// 5. TAMBAHKAN BARIS INI (Untuk mengaktifkan variabel database bernama 'db')
+const db = getFirestore(app);
 <!doctype html>
 <html lang="id">
 <head>
@@ -1079,3 +1103,38 @@
 </script>
 </body>
 </html>
+// ==========================================
+// KODE TAMBAHAN UNTUK FIREBASE REAL-TIME
+// ==========================================
+
+// Fungsi A: Untuk mengirim data titik baru ke Firebase
+async function simpanKoordinatBaru(namaLokasi, lat, lng) {
+  try {
+    const docRef = await addDoc(collection(db, "peta_sika"), {
+      nama: namaLokasi,
+      latitude: lat,
+      longitude: lng,
+      waktu_input: new Date()
+    });
+    console.log("Data berhasil tersimpan di Firebase dengan ID: ", docRef.id);
+  } catch (e) {
+    console.error("Gagal menyimpan data ke Firebase: ", e);
+  }
+}
+
+// Fungsi B: Mengintip & menangkap data dari Firebase secara Real-Time
+onSnapshot(collection(db, "peta_sika"), (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+            const dataBaru = change.doc.data();
+            console.log("Ada data baru masuk dari Firebase:", dataBaru);
+            
+            // CATATAN: Di sini nanti kita hubungkan dengan fungsi marker peta Anda 
+            // agar titiknya otomatis muncul di layar tanpa perlu refresh.
+        }
+    });
+});
+
+// KODE TES: Menjalankan fungsi kirim data otomatis saat halaman web dibuka
+// Anda bisa menghapus atau memberi tanda komentar (//) pada baris di bawah ini nanti.
+simpanKoordinatBaru("Titik Tes SIKA 1", -1.2345, 116.8910);
