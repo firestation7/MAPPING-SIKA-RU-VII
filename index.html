@@ -1117,6 +1117,34 @@
               }
           });
       });
+    // MENGHUBUNGKAN TOMBOL DI FORM HTML LANGSUNG KE FIREBASE
+      document.getElementById("btnSimpanLokasi").addEventListener("click", async () => {
+          const namaLokasi = document.getElementById("inputNama").value;
+          const latLokasi = parseFloat(document.getElementById("inputLat").value);
+          const lngLokasi = parseFloat(document.getElementById("inputLng").value);
+
+          if (namaLokasi && latLokasi && lngLokasi) {
+              try {
+                  // Perintah otomatis melempar data ke tabel peta_sika
+                  await addDoc(collection(db, "peta_sika"), {
+                      nama: namaLokasi,
+                      latitude: latLokasi,
+                      longitude: lngLokasi
+                  });
+                  
+                  // Mengosongkan kembali kotak input setelah berhasil
+                  document.getElementById("inputNama").value = "";
+                  document.getElementById("inputLat").value = "";
+                  document.getElementById("inputLng").value = "";
+                  
+                  alert("Sukses! Titik baru berhasil dikirim ke semua peta laptop.");
+              } catch (error) {
+                  alert("Gagal mengirim data, cek koneksi internet.");
+              }
+          } else {
+              alert("Mohon isi semua kolom (Nama, Lat, Lng) terlebih dahulu!");
+          }
+      });
     </script>
 </body>
 </html>
