@@ -1056,45 +1056,73 @@
   <!-- END: Floating Due-24h Panel -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-      const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
-      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const formSika = document.querySelector('.sidebar') || document.querySelector('form');
+  <script>
+    // Konfigurasi Database Supabase Anda
+    const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      async function kirimDataSikaKeSupabase(event) {
+    // Fungsi Utama Pengiriman Data Ke Supabase
+    async function kirimDataSikaKeSupabase(event) {
       if (event) event.preventDefault();
-      const dataSika = {
-        nomor_registrasi: document.getElementById('permit')?.value || '',
-        Nomor_Registrasi_Area: document.getElementById('reg')?.value || '',
-        Pekerjaan: document.getElementById('name')?.value || '',
-        Tanggal_Registrasi: document.getElementById('regDate')?.value || null,
-        Tanggal_Kadaluarsa: document.getElementById('expiry')?.value || null,
-        Nama_Perusahaan: document.getElementById('company')?.value || document.getElementById('perusahaan')?.value || '', 
-        Lokasi_Pekerjaan: document.getElementById('location')?.value || document.getElementById('lokasi')?.value || '',
-        Jenis_Izin_Kerja: document.getElementById('permitType')?.value || '',
-        Status_Izin: document.getElementById('status')?.value || '',
-        Jenis_Area: document.getElementById('areaType')?.value || '',
-        Kritikalitas: document.getElementById('criticality')?.value || '',
-        Latitude: parseFloat(document.getElementById('lat')?.value || document.getElementById('latitude')?.value || 0),
-        Longitude: parseFloat(document.getElementById('lng')?.value || document.getElementById('longitude')?.value || 0),
-        Radius: parseInt(document.getElementById('radius')?.value || 0)
-      };
-      const { data, error } = await supabase
-        .from('sika_Point')
-        .insert([dataSika]);
 
-      if (error) {
-        alert('Gagal menyimpan data ke Cloud: ' + error.message);
-        console.error(error);
-      } else {
-        alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
-        if (typeof buildList === 'function') buildList();
+      console.log("Tombol Simpan SIKA diklik, memulai proses sinkronisasi...");
+
+      try {
+        // Mengambil data dari ID input asli yang ada di HTML Anda
+        const dataSika = {
+          nomor_registrasi: document.getElementById('permit')?.value || '', 
+          Nomor_Registrasi_Area: document.getElementById('reg')?.value || '', 
+          Pekerjaan: document.getElementById('name')?.value || '', 
+          Tanggal_Registrasi: document.getElementById('regDate')?.value || null, 
+          Tanggal_Kadaluarsa: document.getElementById('expiry')?.value || null, 
+          
+          // Bidang pendukung lainnya (menggunakan ID standar atau fallback jika ada penyesuaian nama)
+          Nama_Perusahaan: document.getElementById('company')?.value || document.getElementById('perusahaan')?.value || '', 
+          Lokasi_Pekerjaan: document.getElementById('location')?.value || document.getElementById('lokasi')?.value || '',
+          Jenis_Izin_Kerja: document.getElementById('permitType')?.value || '',
+          Status_Izin: document.getElementById('status')?.value || '',
+          Jenis_Area: document.getElementById('areaType')?.value || '',
+          Kritikalitas: document.getElementById('criticality')?.value || '',
+          
+          // Data spasial peta koordinat dan radius (menggunakan parseFloat/parseInt agar tipe data sesuai di database)
+          Latitude: parseFloat(document.getElementById('lat')?.value || document.getElementById('latitude')?.value || 0),
+          Longitude: parseFloat(document.getElementById('lng')?.value || document.getElementById('longitude')?.value || 0),
+          Radius: parseInt(document.getElementById('radius')?.value || 50) 
+        };
+
+        // Memasukkan data ke tabel sika_Point di cloud database Supabase
+        const { data, error } = await supabase
+          .from('sika_Point') 
+          .insert([dataSika]);
+
+        if (error) {
+          alert('Gagal menyimpan ke Cloud Database: ' + error.message);
+          console.error(error);
+        } else {
+          alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
+          
+          // Opsional: Memanggil fungsi pembaruan list peta jika tersedia di sistem utama Anda
+          if (typeof buildList === 'function') buildList();
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan koneksi sistem: ' + err.message);
+        console.error(err);
       }
     }
-    if (formSika) {
-      formSika.addEventListener('submit', kirimDataSikaKeSupabase);
-    }
-    </script>
+
+    // MENYAMBUNGKAN KE TOMBOL DI HEADER (id="toggleSave")
+    // Kode ini mendeteksi tombol ikon disket di header atas dan menempelkan fungsi simpan online
+    document.addEventListener("DOMContentLoaded", function() {
+      const tombolSimpanHeader = document.getElementById('toggleSave');
+      if (tombolSimpanHeader) {
+        tombolSimpanHeader.addEventListener('click', kirimDataSikaKeSupabase);
+        console.log("Sistem berhasil menyambungkan pemicu database ke tombol toggleSave di header.");
+      } else {
+        console.warn("Peringatan: Elemen tombol dengan id 'toggleSave' tidak ditemukan di halaman.");
+      }
+    });
+  </script>
 </body>
 </html>
