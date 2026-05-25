@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>Monitoring Area Kerja - Satelit (Izin Kerja)</title>
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Leaflet Draw CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
 
   <style>
@@ -104,7 +102,6 @@
         <option>Lain-Lain</option>
       </select>
 
-      <!-- NEW: Jenis Izin Kerja -->
       <label>Jenis Izin Kerja</label>
       <select id="workType">
         <option value="">-- Pilih Jenis Izin --</option>
@@ -116,7 +113,6 @@
         <option>Bawah Air</option>
       </select>
 
-      <!-- NEW: Status Izin -->
       <label>Status Izin</label>
       <select id="statusPermit">
         <option value="">-- Pilih Status Izin --</option>
@@ -168,7 +164,6 @@
         <option value="nodate">Tanpa Tanggal</option>
       </select>
 
-      <!-- NEW: List search and location filter -->
       <div class="list-controls" style="margin-top:8px">
         <input id="search" placeholder="Cari pekerjaan (nama, izin, reg, perusahaan)..." />
         <select id="listLocationFilter" title="Filter Lokasi">
@@ -217,11 +212,53 @@
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    // Inisialisasi Supabase secara online di awal script
+    const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Fungsi Pengiriman Data Paralel ke Cloud Supabase
+    async function kirimKeSupabaseCloud(objSika) {
+      console.log("Memulai proses background sync ke Supabase...");
+      try {
+        // Pemetaan objek data agar pas 100% dengan nama kolom di tabel sika_Point Supabase Anda
+        const dataSika = {
+          nomor_registrasi: objSika.permit || '', 
+          Nomor_Registrasi_Area: objSika.reg || '', 
+          Pekerjaan: objSika.name || '', 
+          Tanggal_Registrasi: objSika.regDate || null, 
+          Tanggal_Kadaluarsa: objSika.expiry || null, 
+          Nama_Perusahaan: objSika.company || '', 
+          Lokasi_Pekerjaan: objSika.location || '',
+          Jenis_Izin_Kerja: objSika.workType || '',
+          Status_Izin: objSika.statusPermit || '',
+          Jenis_Area: objSika.type || '',
+          Kritikalitas: objSika.crit || '',
+          Latitude: parseFloat(objSika.lat || 0),
+          Longitude: parseFloat(objSika.lng || 0),
+          Radius: parseInt(objSika.radius || 50)
+        };
+
+        const { error } = await supabaseClient
+          .from('sika_Point')
+          .insert([dataSika]);
+
+        if (error) {
+          console.error('Gagal Sinkronisasi Cloud Supabase:', error.message);
+        } else {
+          console.log('Sinkronisasi Cloud Supabase Berhasil!');
+          alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
+        }
+      } catch (err) {
+        console.error('Terjadi interupsi jaringan Supabase:', err.message);
+      }
+    }
+
     // Helper
     const qs = id => document.getElementById(id);
 
@@ -531,7 +568,7 @@
       }
     }
 
-    // Form handling
+    // Form handling (Disatukan langsung dengan fungsi Supabase agar tidak konflik)
     qs('addBtn').addEventListener('click', ()=>{
       const reg = qs('reg').value.trim();
       const regDate = qs('regDate').value || null;
@@ -558,18 +595,25 @@
         return;
       }
 
+      // Bungkus data saat ini ke dalam satu objek terpadu
+      const dataPayload = { reg, regDate, permit, name, company, location, locationStatus, type, crit, lat, lng, radius, expiry, workType, statusPermit };
+
       if(editingId){
-        updateArea(editingId, { reg, regDate, permit, name, company, location, locationStatus, type, crit, lat, lng, radius, expiry, workType, statusPermit });
+        updateArea(editingId, dataPayload);
         editingId = null;
         qs('addBtn').textContent = 'Tambah / Simpan';
-        // after update, ensure expired visibility handled
         pruneExpiredVisibility();
+        
+        // Pemicu Pengiriman Cloud ke Supabase saat Update Edit
+        kirimKeSupabaseCloud(dataPayload);
         return;
       }
 
-      addAreaToMap({ reg, regDate, permit, name, company, location, locationStatus, type, crit, lat, lng, radius, expiry, workType, statusPermit });
-      // handle expiry right away
+      addAreaToMap(dataPayload);
       pruneExpiredVisibility();
+
+      // Pemicu Pengiriman Cloud ke Supabase saat Tambah Baru
+      kirimKeSupabaseCloud(dataPayload);
     });
 
     qs('clearBtn').addEventListener('click', ()=>{
@@ -633,8 +677,13 @@
       layer.bindPopup(`<b>${reg} - ${name}</b><br>Perusahaan: ${company||'-'}<br>Izin: ${permit}<br>${crit}<br>Jenis Izin: ${workType||'-'}<br>Status Izin: ${statusPermit||'-'}<br>Expiry: ${expiry||'-'}<br>Reg: ${regDate||'-'}<br>Lokasi: ${location||'-'} • ${locationStatus}`);
       drawnItems.addLayer(layer);
 
-      addAreaToMap({ reg, regDate: regDate || null, permit, name, company: company || null, location: location || null, locationStatus, type:'polygon', crit, geojson, expiry, workType, statusPermit });
+      const polygonPayload = { reg, regDate: regDate || null, permit, name, company: company || null, location: location || null, locationStatus, type:'polygon', crit, geojson, expiry, workType, statusPermit };
+      
+      addAreaToMap(polygonPayload);
       pruneExpiredVisibility();
+
+      // Pemicu Otomatis Supabase untuk Gambar Poligon manual
+      kirimKeSupabaseCloud(polygonPayload);
     });
 
     map.on('draw:deleted', function(e){
@@ -751,7 +800,6 @@
     updateMapLayerVisibilityByFilter();
   </script>
 
-  <!-- START: Floating Due-24h Panel -->
   <style>
     /* Floating panel styling */
     #floatingDuePanel{
@@ -890,12 +938,6 @@
       if(h>0) return `${h}j ${m}m`;
       if(m>0) return `${m}m`;
       return `${s}s`;
-    }
-
-    function colorForCrit(c){
-      if(c==='high') return '#ef4444';
-      if(c==='medium') return '#f59e0b';
-      return '#60a5fa';
     }
 
     function buildList(){
@@ -1053,72 +1095,5 @@
 
   })();
   </script>
-  <!-- END: Floating Due-24h Panel -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    // Konfigurasi Cloud Database Supabase Anda
-    const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; // Pastikan Key utuh Anda
-    
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Fungsi Utama Mengirim Data SIKA ke Supabase
-    async function kirimDataSikaKeSupabase(event) {
-      // Kita tidak menggunakan event.preventDefault() di sini agar tidak mengganggu fungsi peta lokal Anda yang sudah ada
-      console.log("Tombol 'Tambah / Simpan' diklik. Memulai sinkronisasi ke Supabase...");
-
-      try {
-        // Membaca data input berdasarkan ID asli dari elemen HTML Anda
-        const dataSika = {
-          nomor_registrasi: document.getElementById('permit')?.value || '', 
-          Nomor_Registrasi_Area: document.getElementById('reg')?.value || '', 
-          Pekerjaan: document.getElementById('name')?.value || '', 
-          Tanggal_Registrasi: document.getElementById('regDate')?.value || null, 
-          Tanggal_Kadaluarsa: document.getElementById('expiry')?.value || null, 
-          
-          // Bidang pelengkap formulir SIKA
-          Nama_Perusahaan: document.getElementById('company')?.value || document.getElementById('perusahaan')?.value || '', 
-          Lokasi_Pekerjaan: document.getElementById('location')?.value || document.getElementById('lokasi')?.value || '',
-          Jenis_Izin_Kerja: document.getElementById('permitType')?.value || '',
-          Status_Izin: document.getElementById('status')?.value || '',
-          Jenis_Area: document.getElementById('areaType')?.value || '',
-          Kritikalitas: document.getElementById('criticality')?.value || '',
-          
-          // Mengonversi koordinat dan radius menjadi angka desimal/bulat agar cocok dengan tipe data tabel Supabase
-          Latitude: parseFloat(document.getElementById('lat')?.value || document.getElementById('latitude')?.value || 0),
-          Longitude: parseFloat(document.getElementById('lng')?.value || document.getElementById('longitude')?.value || 0),
-          Radius: parseInt(document.getElementById('radius')?.value || 50)
-        };
-
-        // Mengirimkan objek data ke tabel sika_Point di database
-        const { data, error } = await supabase
-          .from('sika_Point') // Sesuai nama tabel di dashboard Supabase Anda
-          .insert([dataSika]);
-
-        if (error) {
-          console.error('Gagal menyimpan ke Cloud Supabase:', error.message);
-        } else {
-          alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
-          if (typeof buildList === 'function') buildList();
-        }
-      } catch (err) {
-        console.error('Terjadi interupsi sistem koneksi:', err.message);
-      }
-    }
-
-    // MENYAMBUNGKAN KE TOMBOL UTAMA SIDEBAR (id="addBtn")
-    // Fungsi dijalankan setelah seluruh elemen halaman web selesai dimuat
-    document.addEventListener("DOMContentLoaded", function() {
-      const tombolTambahSimpan = document.getElementById('addBtn');
-      if (tombolTambahSimpan) {
-        // Menambahkan pemicu klik database tanpa menghapus fungsi plot peta bawaan Anda
-        tombolTambahSimpan.addEventListener('click', kirimDataSikaKeSupabase);
-        console.log("Sistem berhasil mengamankan jalur Supabase ke tombol addBtn.");
-      } else {
-        console.warn("Peringatan: Elemen tombol dengan id 'addBtn' tidak ditemukan.");
-      }
-    });
-  </script>
-</body>
+  </body>
 </html>
