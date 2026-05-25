@@ -522,16 +522,33 @@
       });
     }
 
-    function removeArea(id){
-      const idx = areas.findIndex(x=>x.id===id);
-      if(idx===-1) return;
-      const a = areas[idx];
-      if(a.layer) map.removeLayer(a.layer);
-      areas.splice(idx,1);
-      saveToStorage();
-      rebuildList();
-      updateMapLayerVisibilityByFilter();
-    }
+     async function removeArea(id) {
+  // 1. TAMBAHKAN INI: Perintah hapus ke Supabase
+  const { error } = await supabaseClient
+    .from('sika_Point')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Gagal hapus di Supabase:', error.message);
+    alert('Gagal menghapus data di database!');
+    return; // Berhenti di sini jika gagal
+  }
+
+  // 2. Jika sukses di Supabase, baru kita hapus dari tampilan web
+  const idx = areas.findIndex(x => x.id === id);
+  if (idx !== -1) {
+    if (areas[idx].layer) map.removeLayer(areas[idx].layer);
+    areas.splice(idx, 1);
+  }
+  
+  // 3. Simpan perubahan ke memori lokal & segarkan list
+  saveToStorage();
+  rebuildList();
+  if (typeof updateMapLayerVisibilityByFilter === 'function') updateMapLayerVisibilityByFilter();
+  
+  console.log('Data berhasil dihapus dari Supabase dan Web!');
+}
 
     // Add area to map (and store)
     function addAreaToMap(obj, fit=true){
