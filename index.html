@@ -221,8 +221,42 @@
     const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-
+// Memasang "telinga" (Realtime Listener) agar peta update otomatis
+supabaseClient
+  .channel('sika_realtime_sync')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'sika_Point' },
+    (payload) => {
+      console.log('Ada data baru masuk secara realtime:', payload.new);
+      
+      const item = payload.new;
+      // Memetakan data dari Supabase ke format yang dipahami peta
+      const formatPeta = {
+        id: item.id,
+        reg: item['Nomor Registrasi Area'],
+        permit: item['Nomor Registrasi Izin Kerja'],
+        name: item['Pekerjaan'],
+        regDate: item['Tanggal Registrasi'],
+        expiry: item['Tanggal Kadaluarsa Izin (opsional)'],
+        company: item['Nama Perusahaan'],
+        location: item['Lokasi Pekerjaan'],
+        workType: item['Jenis Izin Kerja'],
+        statusPermit: item['Status Izin'],
+        type: item['Jenis Area'],
+        crit: item['Kritikalitas'],
+        lat: parseFloat(item['Latitude'] || 0),
+        lng: parseFloat(item['Longitude'] || 0),
+        radius: parseInt(item['Radius (meter) — untuk Lingkaran'] || 50)
+      };
+      
+      // Menambah titik ke peta secara instan tanpa perlu refresh
+      addAreaToMap(formatPeta, false); 
+      if(typeof rebuildList === 'function') rebuildList();
+      console.log("Data baru berhasil digambar di peta secara otomatis!");
+    }
+  )
+  .subscribe();
     async function kirimKeSupabaseCloud(objSika) {
       console.log("Memulai proses background sync ke Supabase...");
       try {
