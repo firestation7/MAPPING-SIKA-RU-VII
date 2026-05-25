@@ -222,7 +222,7 @@
     const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Fungsi Pengiriman Data Paralel ke Cloud Supabase
+
     async function kirimKeSupabaseCloud(objSika) {
       console.log("Memulai proses background sync ke Supabase...");
       try {
@@ -233,14 +233,14 @@
           'Tanggal Registrasi': objSika.regDate || null, 
           'Tanggal Kadaluarsa Izin (opsional)': objSika.expiry || null, 
           'Nama Perusahaan': objSika.company || '', 
-          'Lokasi Kerja': objSika.location || '',
+          'Lokasi Pekerjaan': objSika.location || '',
           'Jenis Izin Kerja': objSika.workType || '',
           'Status Izin': objSika.statusPermit || '',
           'Jenis Area': objSika.type || '',
           'Kritikalitas': objSika.crit || '',
           'Latitude': parseFloat(objSika.lat || 0),
           'Longitude': parseFloat(objSika.lng || 0),
-          'Radius (meter) — untuk Lingkaran': parseInt(objSika.radius || 50)
+          'Radius (meter) — untuk Lingkaran': objSika.type === 'circle' ? parseInt(objSika.radius || 50) : null
         };
 
         const { error } = await supabaseClient
@@ -248,16 +248,17 @@
           .insert([dataSika]);
 
         if (error) {
-          console.error('Gagal Sinkronisasi Cloud Supabase:', error.message);
+          // KODE BARU: Memunculkan alertbox jika Supabase menolak data Anda
+          alert('Supabase Menolak Data!\nPesan Error: ' + error.message + '\nKode: ' + error.code + '\nDetail: ' + error.details);
+          console.error('Gagal Sinkronisasi Cloud Supabase:', error);
         } else {
           console.log('Sinkronisasi Cloud Supabase Berhasil!');
           alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
         }
       } catch (err) {
-        console.error('Terjadi interupsi jaringan Supabase:', err.message);
+        alert('Gagal terhubung ke server database: ' + err.message);
       }
     }
-
     // Helper
     const qs = id => document.getElementById(id);
 
