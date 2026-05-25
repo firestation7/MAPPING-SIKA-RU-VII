@@ -1054,97 +1054,47 @@
   })();
   </script>
   <!-- END: Floating Due-24h Panel -->
-  <script type="module">
-      // Ambil peralatan database dari internet
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-      import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      // Konfigurasi Firebase milik sika-ru-vii
-      const firebaseConfig = {
-        apiKey: "AIzaSyBjCqc9YIgBFauo1H1C-iRF6bZheP-ED2U",
-        authDomain: "sika-ru-vii-f2197.firebaseapp.com",
-        projectId: "sika-ru-vii-f2197",
-        storageBucket: "sika-ru-vii-f2197.firebasestorage.app",
-        messagingSenderId: "495089368297",
-        appId: "1:495089368297:web:f76f2f64ea50711e81c478"
+    <script>
+      const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const formSika = document.querySelector('.sidebar') || document.querySelector('form');
+
+      async function kirimDataSikaKeSupabase(event) {
+      if (event) event.preventDefault();
+      const dataSika = {
+        nomor_registrasi: document.getElementById('permit')?.value || '',
+        Nomor_Registrasi_Area: document.getElementById('reg')?.value || '',
+        Pekerjaan: document.getElementById('name')?.value || '',
+        Tanggal_Registrasi: document.getElementById('regDate')?.value || null,
+        Tanggal_Kadaluarsa: document.getElementById('expiry')?.value || null,
+        Nama_Perusahaan: document.getElementById('company')?.value || document.getElementById('perusahaan')?.value || '', 
+        Lokasi_Pekerjaan: document.getElementById('location')?.value || document.getElementById('lokasi')?.value || '',
+        Jenis_Izin_Kerja: document.getElementById('permitType')?.value || '',
+        Status_Izin: document.getElementById('status')?.value || '',
+        Jenis_Area: document.getElementById('areaType')?.value || '',
+        Kritikalitas: document.getElementById('criticality')?.value || '',
+        Latitude: parseFloat(document.getElementById('lat')?.value || document.getElementById('latitude')?.value || 0),
+        Longitude: parseFloat(document.getElementById('lng')?.value || document.getElementById('longitude')?.value || 0),
+        Radius: parseInt(document.getElementById('radius')?.value || 0)
       };
+      const { data, error } = await supabase
+        .from('sika_Point')
+        .insert([dataSika]);
 
-      // Aktifkan koneksi
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      console.log("Firebase sukses terhubung ke peta!");
-
-      // FUNGSI REAL-TIME: Otomatis menggambar marker setiap ada data baru di Firebase
-      onSnapshot(collection(db, "peta_sika"), (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                  const dataBaru = change.doc.data();
-                  
-                  // Menggambar titik ke variabel 'map' milikmu
-                  L.marker([dataBaru.latitude, dataBaru.longitude])
-                   .addTo(map) 
-                   .bindPopup(`<b>${dataBaru.nama}</b>`);
-              }
-          });
-      });
-    </script>
-  <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-      import { getFirestore, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyBjCqc9YIgBFauo1H1C-iRF6bZheP-ED2U",
-        authDomain: "sika-ru-vii-f2197.firebaseapp.com",
-        projectId: "sika-ru-vii-f2197",
-        storageBucket: "sika-ru-vii-f2197.firebasestorage.app",
-        messagingSenderId: "495089368297",
-        appId: "1:495089368297:web:f76f2f64ea50711e81c478"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      console.log("Firebase sukses terhubung ke peta!");
-
-      onSnapshot(collection(db, "peta_sika"), (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                  const dataBaru = change.doc.data();
-                  L.marker([dataBaru.latitude, dataBaru.longitude])
-                   .addTo(map) 
-                   .bindPopup(`<b>${dataBaru.nama}</b>`);
-              }
-          });
-      });
-    // MENGHUBUNGKAN TOMBOL DI FORM HTML LANGSUNG KE FIREBASE
-      document.getElementById("btnSimpanLokasi").addEventListener("click", async () => {
-          const namaLokasi = document.getElementById("inputNama").value;
-          const latLokasi = parseFloat(document.getElementById("inputLat").value);
-          const lngLokasi = parseFloat(document.getElementById("inputLng").value);
-
-          if (namaLokasi && latLokasi && lngLokasi) {
-              try {
-                  // Perintah otomatis melempar data ke tabel peta_sika
-                  await addDoc(collection(db, "peta_sika"), {
-                      nama: namaLokasi,
-                      latitude: latLokasi,
-                      longitude: lngLokasi
-                  });
-                  
-                  // Mengosongkan kembali kotak input setelah berhasil
-                  document.getElementById("inputNama").value = "";
-                  document.getElementById("inputLat").value = "";
-                  document.getElementById("inputLng").value = "";
-                  
-                  alert("Sukses! Titik baru berhasil dikirim ke semua peta laptop.");
-              } catch (error) {
-                  alert("Gagal mengirim data, cek koneksi internet.");
-              }
-          } else {
-              alert("Mohon isi semua kolom (Nama, Lat, Lng) terlebih dahulu!");
-          }
-      });
+      if (error) {
+        alert('Gagal menyimpan data ke Cloud: ' + error.message);
+        console.error(error);
+      } else {
+        alert('Data SIKA Berhasil Tersimpan Secara Online ke Supabase!');
+        if (typeof buildList === 'function') buildList();
+      }
+    }
+    if (formSika) {
+      formSika.addEventListener('submit', kirimDataSikaKeSupabase);
+    }
     </script>
 </body>
 </html>
