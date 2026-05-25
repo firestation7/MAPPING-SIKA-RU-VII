@@ -313,16 +313,69 @@
     let editingId = null; // id when editing an existing area
 
     // Load
-    function loadFromStorage(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
+    // FUNGSI BARU: Menarik data langsung dari Cloud Supabase
+    async function loadFromStorage(){
+      console.log("Menarik data terbaru dari Supabase...");
+      try {
+        const { data, error } = await supabaseClient
+          .from('sika_Point')
+          .select('*');
+
+        if (error) {
+          console.error('Gagal ambil data:', error.message);
+          bacaDataCadanganLokal();
+          return;
+        }
+
+        if (data && data.length > 0) {
+          // Bersihkan peta dari data lama sebelum memuat data baru
+          areas.forEach(a => { if(a.layer) map.removeLayer(a.layer); });
+          areas = [];
+
+          data.forEach(item => {
+            const formatPeta = {
+              id: item.id,
+              reg: item['Nomor Registrasi Area'],
+              permit: item['Nomor Registrasi Izin Kerja'],
+              name: item['Pekerjaan'],
+              regDate: item['Tanggal Registrasi'],
+              expiry: item['Tanggal Kadaluarsa Izin (opsional)'],
+              company: item['Nama Perusahaan'],
+              location: item['Lokasi Pekerjaan'],
+              workType: item['Jenis Izin Kerja'],
+              statusPermit: item['Status Izin'],
+              type: item['Jenis Area'],
+              crit: item['Kritikalitas'],
+              lat: parseFloat(item['Latitude'] || 0),
+              lng: parseFloat(item['Longitude'] || 0),
+              radius: parseInt(item['Radius (meter) — untuk Lingkaran'] || 50)
+            };
+            addAreaToMap(formatPeta, false);
+          });
+          
+          rebuildList();
+          updateMapLayerVisibilityByFilter();
+          if(typeof refreshDuePanel === 'function') refreshDuePanel();
+        } else {
+          bacaDataCadanganLokal();
+        }
+      } catch (e) { 
+        bacaDataCadanganLokal();
+      }
+    }
+
+    // Fungsi cadangan jika internet mati
+    function bacaDataCadanganLokal() {
+      try {
+        const raw = localStorage.getItem('monitoring_areas_with_permit_v2');
         if(!raw) return;
         const parsed = JSON.parse(raw);
         if(Array.isArray(parsed)){
           parsed.forEach(item => addAreaToMap(item, false));
         }
-      }catch(e){ console.warn('load error', e); }
+      } catch(err) { console.warn('Gagal baca lokal', err); }
     }
+ 
 
     function saveToStorage(){
       try{
