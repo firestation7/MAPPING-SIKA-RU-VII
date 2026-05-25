@@ -404,47 +404,7 @@
 
       areas.forEach(a => {
         const status = computeStatus(a.expiry);
-        // Di dalam loop areas.forEach(item => { ...
-    const itemElement = document.createElement('div');
-    itemElement.className = 'item-style'; // Sesuaikan dengan class CSS Anda
-    itemElement.innerHTML = `
-        <strong>${item.name}</strong><br>
-        <span>${item.company}</span>
-    `;
-
-    // Membuat kontainer tombol
-    const btnContainer = document.createElement('div');
-    btnContainer.style.marginTop = '10px';
-    btnContainer.style.display = 'flex';
-    btnContainer.style.gap = '5px';
-
-    // Tombol Edit
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '✏️ Edit';
-    editBtn.onclick = () => {
-        // Logika untuk mengisi form dan mengubah status ke mode edit
-        editingId = item.id;
-        document.getElementById('addBtn').textContent = 'Update Data';
-        // ... panggil fungsi untuk mengisi input form Anda ...
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
-
-    // Tombol Hapus
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '🗑️ Hapus';
-    delBtn.style.color = 'red';
-    delBtn.onclick = () => {
-        if(confirm('Yakin ingin menghapus data ini?')) {
-            removeArea(item.id); // Ini akan memicu hapus di Supabase & Realtime update
-        }
-    };
-
-    btnContainer.appendChild(editBtn);
-    btnContainer.appendChild(delBtn);
-    itemElement.appendChild(btnContainer); // Masukkan tombol ke dalam item daftar
-    container.appendChild(itemElement);
-// });
-
+    
         // apply search + location filters for list display
         // Search matches reg, permit, name, company
         const combined = ((a.reg||'') + ' ' + (a.permit||'') + ' ' + (a.name||'') + ' ' + (a.company||'')).toLowerCase();
