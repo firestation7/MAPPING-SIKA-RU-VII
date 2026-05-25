@@ -165,7 +165,7 @@
       </select>
 
       <div class="list-controls" style="margin-top:8px">
-        <input id="search" placeholder="Cari pekerjaan (nama, izin, reg, perusahaan)..." />
+        <input id="search" placeholder="Cari  (nama, izin, reg, perusahaan)..." />
         <select id="listLocationFilter" title="Filter Lokasi">
           <option value="all">Semua Lokasi</option>
           <option value="OM">OM</option>
@@ -226,22 +226,21 @@
     async function kirimKeSupabaseCloud(objSika) {
       console.log("Memulai proses background sync ke Supabase...");
       try {
-        // Pemetaan objek data agar pas 100% dengan nama kolom di tabel sika_Point Supabase Anda
         const dataSika = {
-          nomor_registrasi: objSika.permit || '', 
-          Nomor_Registrasi_Area: objSika.reg || '', 
-          Pekerjaan: objSika.name || '', 
-          Tanggal_Registrasi: objSika.regDate || null, 
-          Tanggal_Kadaluarsa: objSika.expiry || null, 
-          Nama_Perusahaan: objSika.company || '', 
-          Lokasi_Pekerjaan: objSika.location || '',
-          Jenis_Izin_Kerja: objSika.workType || '',
-          Status_Izin: objSika.statusPermit || '',
-          Jenis_Area: objSika.type || '',
-          Kritikalitas: objSika.crit || '',
-          Latitude: parseFloat(objSika.lat || 0),
-          Longitude: parseFloat(objSika.lng || 0),
-          Radius: parseInt(objSika.radius || 50)
+          'Nomor Registrasi Area': objSika.reg || '', 
+          'Nomor Registrasi Izin Kerja': objSika.permit || '', 
+          'Pekerjaan': objSika.name || '', 
+          'Tanggal Registrasi': objSika.regDate || null, 
+          'Tanggal Kadaluarsa Izin (opsional)': objSika.expiry || null, 
+          'Nama Perusahaan': objSika.company || '', 
+          'Lokasi Kerja': objSika.location || '',
+          'Jenis Izin Kerja': objSika.workType || '',
+          'Status Izin': objSika.statusPermit || '',
+          'Jenis Area': objSika.type || '',
+          'Kritikalitas': objSika.crit || '',
+          'Latitude': parseFloat(objSika.lat || 0),
+          'Longitude': parseFloat(objSika.lng || 0),
+          'Radius (meter) — untuk Lingkaran': parseInt(objSika.radius || 50)
         };
 
         const { error } = await supabaseClient
