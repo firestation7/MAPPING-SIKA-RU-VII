@@ -630,10 +630,13 @@
     function updateArea(id, data){
       const idx = areas.findIndex(a=>a.id===id);
       if(idx===-1) return;
+      
+      // TAMBAHKAN PEMANGGILAN SUPABASE DI SINI:
+      updateDataSupabase(id, data); 
+
       const old = areas[idx];
-      // remove old layer
       if(old.layer) map.removeLayer(old.layer);
-      // create new layer
+      
       if(data.location && !data.locationStatus) data.locationStatus = locationStatusFor(data.location);
       const merged = Object.assign({}, old, data);
       const toAdd = Object.assign({}, merged);
@@ -704,13 +707,15 @@
       const dataPayload = { reg, regDate, permit, name, company, location, locationStatus, type, crit, lat, lng, radius, expiry, workType, statusPermit };
 
       if(editingId){
+        // 1. Update ke Supabase
+        updateDataSupabase(editingId, dataPayload); 
+        
+        // 2. Update tampilan lokal
         updateArea(editingId, dataPayload);
+        
         editingId = null;
         qs('addBtn').textContent = 'Tambah / Simpan';
         pruneExpiredVisibility();
-        
-        // Pemicu Pengiriman Cloud ke Supabase saat Update Edit
-        kirimKeSupabaseCloud(dataPayload);
         return;
       }
 
