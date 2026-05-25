@@ -549,6 +549,34 @@
   
   console.log('Data berhasil dihapus dari Supabase dan Web!');
 }
+    async function updateDataSupabase(id, dataPayload) {
+  const { error } = await supabaseClient
+    .from('sika_Point')
+    .update({
+      'Nomor Registrasi Area': dataPayload.reg,
+      'Nomor Registrasi Izin Kerja': dataPayload.permit,
+      'Pekerjaan': dataPayload.name,
+      'Tanggal Registrasi': dataPayload.regDate,
+      'Tanggal Kadaluarsa Izin (opsional)': dataPayload.expiry,
+      'Nama Perusahaan': dataPayload.company,
+      'Lokasi Pekerjaan': dataPayload.location,
+      'Jenis Izin Kerja': dataPayload.workType,
+      'Status Izin': dataPayload.statusPermit,
+      'Jenis Area': dataPayload.type,
+      'Kritikalitas': dataPayload.crit,
+      'Latitude': parseFloat(dataPayload.lat),
+      'Longitude': parseFloat(dataPayload.lng),
+      'Radius (meter) — untuk Lingkaran': parseInt(dataPayload.radius)
+    })
+    .eq('id', id);
+
+  if (error) {
+    console.error('Gagal update ke Supabase:', error.message);
+    alert('Gagal menyimpan perubahan ke database!');
+  } else {
+    console.log('Data sukses terupdate di Supabase!');
+  }
+}
 
     // Add area to map (and store)
     function addAreaToMap(obj, fit=true){
