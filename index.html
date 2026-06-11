@@ -46,166 +46,122 @@
     .list-controls{display:flex;gap:8px;align-items:center;margin-top:10px}
     .list-controls input{flex:1}
     .list-controls select{width:160px}
-
-    /* KODE BARU: Gaya Tampilan Halaman Login */
-    #loginOverlay {
-      position: fixed;
-      inset: 0;
-      background: #0f172a;
-      z-index: 99999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .login-box {
-      background: #fff;
-      padding: 24px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
-    }
-    .login-box h2 { margin: 0 0 4px 0; font-size: 20px; text-align: center; }
-    .login-box p { margin: 0 0 20px 0; font-size: 13px; color: #64748b; text-align: center; }
-    .login-box .btn-login { background: var(--accent); color: #fff; font-weight: 600; margin-top: 16px; border: none; cursor: pointer; }
-    .admin-only, .btn-action-admin { display: none; } /* Default tersembunyi, aktif jika admin */
   </style>
 </head>
 <body>
-
-  <div id="loginOverlay">
-    <div class="login-box">
-      <h2>Sistem Monitoring SIKA</h2>
-      <p>Silakan masuk untuk mengakses peta area kerja</p>
-      
-      <label style="margin-top:0;">Username</label>
-      <input id="loginUser" type="text" placeholder="Masukkan username" />
-      
-      <label>Password</label>
-      <input id="loginPass" type="password" placeholder="Masukkan password" />
-      
-      <button id="btnLogin" class="btn-login">Masuk Aplikasi</button>
-    </div>
-  </div>
-
   <header>
     <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:6px">🛰️</div>
     <div class="title">Monitoring Area Kerja — Citra Satelit (Izin Kerja)</div>
-    <button id="toggleSave" title="Simpan/Restore" class="btn admin-only" style="background:#fff;border-radius:8px">💾</button>
-    <button id="btnLogout" class="btn" style="background:#dc2626; color:#fff; font-weight:600; width:auto; margin-top:0; margin-left:8px; padding:6px 12px;">Keluar</button>
+    <button id="toggleSave" title="Simpan/Restore" class="btn" style="background:#fff;border-radius:8px">💾</button>
   </header>
 
   <div id="app">
     <div class="sidebar" id="sidebar">
+      <label>Nomor Registrasi Area</label>
+      <input id="reg" placeholder="000/KPI49A10/IKP/XI/2025" />
+
+      <label>Nomor Registrasi Izin Kerja</label>
+      <input id="permit" placeholder="000/REG/HSE/XI/2025" />
+
+      <label>Pekerjaan</label>
+      <input id="name" placeholder="Pekerjaan Pengelasan" />
       
-      <div class="admin-only" id="adminFormFields">
-        <label>Nomor Registrasi Area</label>
-        <input id="reg" placeholder="000/KPI49A10/IKP/XI/2025" />
+      <label>Tanggal Registrasi</label>
+      <input id="regDate" type="date" />
 
-        <label>Nomor Registrasi Izin Kerja</label>
-        <input id="permit" placeholder="000/REG/HSE/XI/2025" />
+      <label>Tanggal Kadaluarsa Izin (opsional)</label>
+      <input id="expiry" type="date" />
 
-        <label>Pekerjaan</label>
-        <input id="name" placeholder="Pekerjaan Pengelasan" />
+      <label>Nama Perusahaan</label>
+      <select id="company">
+        <option value="">-- Pilih Perusahaan --</option>
+        <option>PT PAMITRA JK</option>
+        <option>PT PATRA TRADING SERVICE</option>
+        <option>PT PAMITRA MEKSIP</option>
+        <option>PT PERTA MC</option>
+        <option>PT APIK</option>
+        <option>PT PATRA JASA</option>
+        <option>PT ANUGRAH ASMAT</option>
+        <option>MAINTENANCE</option>
+        <option>HK</option>
+        <option>HK JSE</option>
+        <option>HK PRATAMA</option>
+        <option>Tejo Lomanis</option>
         
-        <label>Tanggal Registrasi</label>
-        <input id="regDate" type="date" />
+      </select>
 
-        <label>Tanggal Kadaluarsa Izin (opsional)</label>
-        <input id="expiry" type="date" />
+      <label>Lokasi Pekerjaan</label>
+      <select id="location">
+        <option value="">-- Pilih Lokasi --</option>
+        <option>OM</option>
+        <option>UTL</option>
+        <option>CDU</option>
+        <option>NHTU</option>
+        <option>CRU</option>
+        <option>Jetty 1</option>
+        <option>Jetty 2</option>
+        <option>Jetty 3</option>
+        <option>Open Access</option>
+        <option>Community/Mess TKJP</option>
+        <option>Kantor</option>
+        <option>Gudang Limbah</option>
+        <option>Lain-Lain</option>
+      </select>
 
-        <label>Nama Perusahaan</label>
-        <select id="company">
-          <option value="">-- Pilih Perusahaan --</option>
-          <option>PT PAMITRA JK</option>
-          <option>PT PATRA TRADING SERVICE</option>
-          <option>PT PAMITRA MEKSIP</option>
-          <option>PT PERTA MC</option>
-          <option>PT APIK</option>
-          <option>PT PATRA JASA</option>
-          <option>PT ANUGRAH ASMAT</option>
-          <option>MAINTENANCE</option>
-          <option>HK</option>
-          <option>HK JSE</option>
-          <option>HK PRATAMA</option>
-          <option>Tejo Lomanis</option>
-        </select>
+      <label>Jenis Izin Kerja</label>
+      <select id="workType">
+        <option value="">-- Pilih Jenis Izin --</option>
+        <option>Dingin</option>
+        <option>Panas</option>
+        <option>Ketinggian</option>
+        <option>Ruang Terbatas</option>
+        <option>Angkat Angkut</option>
+        <option>Bawah Air</option>
+        <option>Radiasi</option>
+        <option>Listrik</option>
+        <option>Penggalian</option>
+      </select>
 
-        <label>Lokasi Pekerjaan</label>
-        <select id="location">
-          <option value="">-- Pilih Lokasi --</option>
-          <option>OM</option>
-          <option>UTL</option>
-          <option>CDU</option>
-          <option>NHTU</option>
-          <option>CRU</option>
-          <option>Jetty 1</option>
-          <option>Jetty 2</option>
-          <option>Jetty 3</option>
-          <option>Open Access</option>
-          <option>Community/Mess TKJP</option>
-          <option>Kantor</option>
-          <option>Gudang Limbah</option>
-          <option>Lain-Lain</option>
-        </select>
+      <label>Status Izin</label>
+      <select id="statusPermit">
+        <option value="">-- Pilih Status Izin --</option>
+        <option>Baru</option>
+        <option>Perpanjang 1</option>
+        <option>Perpanjang 2</option>
+        <option>Perpanjang 3</option>
+      </select>
 
-        <label>Jenis Izin Kerja</label>
-        <select id="workType">
-          <option value="">-- Pilih Jenis Izin --</option>
-          <option>Dingin</option>
-          <option>Panas</option>
-          <option>Ketinggian</option>
-          <option>Ruang Terbatas</option>
-          <option>Angkat Angkut</option>
-          <option>Bawah Air</option>
-          <option>Radiasi</option>
-          <option>Listrik</option>
-          <option>Penggalian</option>
-        </select>
-
-        <label>Status Izin</label>
-        <select id="statusPermit">
-          <option value="">-- Pilih Status Izin --</option>
-          <option>Baru</option>
-          <option>Perpanjang 1</option>
-          <option>Perpanjang 2</option>
-          <option>Perpanjang 3</option>
-        </select>
-
-        <div class="row">
-          <div>
-            <label>Latitude</label>
-            <input id="lat" placeholder="-2.345678" />
-          </div>
-          <div>
-            <label>Longitude</label>
-            <input id="lng" placeholder="117.123456" />
-          </div>
+      <div class="row">
+        <div>
+          <label>Latitude</label>
+          <input id="lat" placeholder="-2.345678" />
         </div>
-
-        <label>Jenis Area</label>
-        <select id="type">
-          <option value="point">Titik (Point)</option>
-          <option value="circle">Lingkaran (Circle)</option>
-          <option value="polygon">Poligon (gambar)</option>
-        </select>
-
-        <label>Kritikalitas</label>
-        <select id="crit">
-          <option value="low">Low (Non-kritis)</option>
-          <option value="medium">Medium (Pengawasan)</option>
-          <option value="high">High (Kritis)</option>
-        </select>
-
-        <label>Radius (meter) — untuk Lingkaran</label>
-        <input id="radius" type="number" placeholder="50" />
-
-        <div class="controls" style="margin-top:10px">
-          <button id="addBtn" class="btn btn-primary">Tambah / Simpan</button>
-          <button id="clearBtn" class="btn btn-danger">Hapus Semua</button>
+        <div>
+          <label>Longitude</label>
+          <input id="lng" placeholder="117.123456" />
         </div>
-        <hr style="border:0; border-top:1px solid #e2e8f0; margin-top:15px;">
+      </div>
+
+      <label>Jenis Area</label>
+      <select id="type">
+        <option value="point">Titik (Point)</option>
+        <option value="circle">Lingkaran (Circle)</option>
+        <option value="polygon">Poligon (gambar)</option>
+      </select>
+
+      <label>Kritikalitas</label>
+      <select id="crit">
+        <option value="low">Low (Non-kritis)</option>
+        <option value="medium">Medium (Pengawasan)</option>
+        <option value="high">High (Kritis)</option>
+      </select>
+
+      <label>Radius (meter) — untuk Lingkaran</label>
+      <input id="radius" type="number" placeholder="50" />
+
+      <div class="controls" style="margin-top:10px">
+        <button id="addBtn" class="btn btn-primary">Tambah / Simpan</button>
+        <button id="clearBtn" class="btn btn-danger">Hapus Semua</button>
       </div>
 
       <label style="margin-top:10px">Filter berdasarkan Status Izin</label>
@@ -240,12 +196,12 @@
         <div style="display:flex;gap:6px;align-items:center"><div class="sw" style="background:#ef4444"></div><div class="small">High</div></div>
       </div>
 
-      <div class="admin-only" style="margin-top:12px;display:flex;gap:8px">
+      <div style="margin-top:12px;display:flex;gap:8px">
         <button id="exportCSV" class="btn">Export CSV</button>
         <button id="exportJSON" class="btn">Export JSON</button>
       </div>
 
-      <div class="admin-only" style="margin-top:8px;display:flex;gap:8px">
+      <div style="margin-top:8px;display:flex;gap:8px">
         <button id="importBtn" class="btn">Import JSON</button>
         <input type="file" id="fileInput" accept="application/json" style="display:none" />
       </div>
@@ -253,9 +209,10 @@
       <div class="list" id="list"></div>
 
       <div class="info footer">
-        <span class="admin-only">• Klik peta untuk mengisi koordinat.<br>• Gambar poligon gunakan tombol draw di pojok kiri peta.<br></span>
-        • Data tersimpan otomatis ke browser (localStorage) & Cloud Supabase.<br>
-        • Tanggal kadaluarsa izin dihitung berakhir pada jam 23:59 pada tanggal yang dipilih.
+        • Klik peta untuk mengisi koordinat.<br>
+        • Gambar poligon gunakan tombol draw di pojok kiri peta.<br>
+        • Data tersimpan otomatis ke browser (localStorage). Gunakan Export/Import untuk backup.<br>
+        • Tanggal kadaluarsa izin dihitung berakhir pada jam 23:59 pada tanggal yang dipilih (izin tetap berlaku sepanjang hari tersebut).
       </div>
     </div>
 
@@ -269,55 +226,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // KODE BARU: Manajemen Autentikasi Pengguna & Penentuan Akun
-    let KELAS_USER = "viewer"; 
-
-    // Konfigurasi akun login silakan sesuaikan di bawah ini:
-    const DAFTAR_AKUN = {
-      "admin123": { pass: "safety123", role: "admin" },
-      "viewer123": { pass: "kasim123", role: "viewer" }
-    };
-
-    document.getElementById("btnLogin").addEventListener("click", () => {
-      const u = document.getElementById("loginUser").value.trim();
-      const p = document.getElementById("loginPass").value.trim();
-
-      if (DAFTAR_AKUN[u] && DAFTAR_AKUN[u].pass === p) {
-        KELAS_USER = DAFTAR_AKUN[u].role;
-        document.getElementById("loginOverlay").style.display = "none";
-        
-        // Terapkan penyesuaian hak akses admin/viewer
-        terapkanHakAksesUbahData();
-      } else {
-        alert("Username atau Password salah! Silakan coba lagi.");
-      }
-    });
-
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      location.reload(); 
-    });
-
-    function terapkanHakAksesUbahData() {
-      if (KELAS_USER === "admin") {
-        // Tampilkan semua fitur manajemen admin
-        document.querySelectorAll(".admin-only").forEach(el => el.style.display = "block");
-        // Hidupkan tool draw leaflet
-        if (typeof drawControl !== 'undefined') map.addControl(drawControl);
-      } else {
-        // Mode Viewer: Sembunyikan elemen modifikasi data
-        document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
-        if (typeof drawControl !== 'undefined') map.removeControl(drawControl);
-      }
-      rebuildList(); 
-    }
-
     // Inisialisasi Supabase secara online di awal script
     const SUPABASE_URL = 'https://ghgnlaehmsagswykbmpt.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_tUT5kac3lzYCWnG4zVSZ_g_7FDCWx-W'; 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     async function kirimKeSupabaseCloud(objSika) {
-      if (KELAS_USER !== "admin") return; // Proteksi tambahan
       console.log("Memulai proses background sync ke Supabase...");
       try {
         const dataSika = {
@@ -342,7 +256,8 @@
           .insert([dataSika]);
 
         if (error) {
-          alert('Supabase Menolak Data!\nPesan Error: ' + error.message);
+          // KODE BARU: Memunculkan alertbox jika Supabase menolak data Anda
+          alert('Supabase Menolak Data!\nPesan Error: ' + error.message + '\nKode: ' + error.code + '\nDetail: ' + error.details);
           console.error('Gagal Sinkronisasi Cloud Supabase:', error);
         } else {
           console.log('Sinkronisasi Cloud Supabase Berhasil!');
@@ -352,7 +267,6 @@
         alert('Gagal terhubung ke server database: ' + err.message);
       }
     }
-
     // Helper
     const qs = id => document.getElementById(id);
 
@@ -362,12 +276,15 @@
       return '#60a5fa';
     }
 
+    // derive a simple lokasi status: Onsite for facility locations, Offsite for Community/Open Access
     function locationStatusFor(loc){
       if(!loc) return '-';
       const offsite = ['Open Access','Community','Community/Mess TKJP'];
       return offsite.includes(loc) ? 'Offsite' : 'Onsite';
     }
 
+    // compute status based on expiry date string (YYYY-MM-DD)
+    // expiry is treated as ending at 23:59:59 on the expiry date (i.e. the permit is valid during the expiry date)
     function computeStatus(expiry){
       if(!expiry) return 'nodate';
       const now = new Date();
@@ -381,6 +298,7 @@
     // Map init
     const map = L.map('map', { fullscreenControl: true }).setView([-2.5, 117.0], 6);
 
+    // Esri Satellite (no API key)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 20,
       attribution: 'Tiles © Esri'
@@ -395,13 +313,15 @@
       },
       edit: { featureGroup: drawnItems, remove: true }
     });
-    // Diatur lewat terapkanHakAksesUbahData() berdasarkan role login
+    map.addControl(drawControl);
 
     // Data store
     let areas = [];
-    const STORAGE_KEY = 'monitoring_areas_with_permit_v2'; 
-    let editingId = null; 
+    const STORAGE_KEY = 'monitoring_areas_with_permit_v2'; // bump version to avoid conflicts
+    let editingId = null; // id when editing an existing area
 
+    // Load
+    // FUNGSI BARU: Menarik data langsung dari Cloud Supabase
     async function loadFromStorage(){
       console.log("Menarik data terbaru dari Supabase...");
       try {
@@ -416,6 +336,7 @@
         }
 
         if (data && data.length > 0) {
+          // Bersihkan peta dari data lama sebelum memuat data baru
           areas.forEach(a => { if(a.layer) map.removeLayer(a.layer); });
           areas = [];
 
@@ -451,6 +372,7 @@
       }
     }
 
+    // Fungsi cadangan jika internet mati
     function bacaDataCadanganLokal() {
       try {
         const raw = localStorage.getItem('monitoring_areas_with_permit_v2');
@@ -462,9 +384,11 @@
       } catch(err) { console.warn('Gagal baca lokal', err); }
     }
  
+
     function saveToStorage(){
       try{
         const out = areas.map(a => {
+          // include hiddenByExpiry so state persists
           if(a.type==='polygon') return { id:a.id, reg:a.reg, regDate:a.regDate || null, permit:a.permit, name:a.name, company:a.company||null, type:'polygon', crit:a.crit, location:a.location||null, locationStatus:a.locationStatus||null, workType: a.workType || null, statusPermit: a.statusPermit || null, geojson:a.geojson, expiry:a.expiry, hiddenByExpiry: a.hiddenByExpiry ? true : false };
           return { id:a.id, reg:a.reg, regDate:a.regDate || null, permit:a.permit, name:a.name, company:a.company||null, location:a.location||null, locationStatus:a.locationStatus||null, type:a.type, crit:a.crit, workType: a.workType || null, statusPermit: a.statusPermit || null, lat:a.lat, lng:a.lng, radius:a.radius, expiry:a.expiry, hiddenByExpiry: a.hiddenByExpiry ? true : false };
         });
@@ -477,35 +401,41 @@
       const container = qs('list'); container.innerHTML = '';
       const filter = qs('filterStatus').value;
       const searchTerm = (qs('search').value || '').trim().toLowerCase();
-      const locFilter = qs('listLocationFilter').value; 
+      const locFilter = qs('listLocationFilter').value; // 'all' or specific or 'nodata'
 
       areas.forEach(a => {
         const status = computeStatus(a.expiry);
     
+        // apply search + location filters for list display
+        // Search matches reg, permit, name, company
         const combined = ((a.reg||'') + ' ' + (a.permit||'') + ' ' + (a.name||'') + ' ' + (a.company||'')).toLowerCase();
         if(searchTerm){
-          if(!combined.includes(searchTerm)) return;
+          if(!combined.includes(searchTerm)) {
+            // doesn't match search -> skip
+            return;
+          }
         }
 
+        // location filter
         if(locFilter && locFilter !== 'all'){
           if(locFilter === 'nodata'){
-            if(a.location) return;
+            if(a.location) return; // user wants only those without location
           } else {
             if(a.location !== locFilter) return;
           }
         }
 
+        // apply status filter for list (if user selected)
         if(filter !== 'all' && filter !== status) return;
 
         const div = document.createElement('div'); div.className='item';
         const meta = document.createElement('div'); meta.className='meta';
         const regDateText = a.regDate ? ` • Reg: ${a.regDate}` : '';
         const statusText = status === 'nodate' ? 'Tanpa Tanggal' : (status==='active' ? 'Active' : (status==='expiring' ? 'Expiring (<24h)' : 'Expired'));
+        // indicate if hidden on map due to expiry
         const hiddenNote = a.hiddenByExpiry ? ' • (dihilangkan dari peta: kadaluarsa)' : '';
-        
         meta.innerHTML = `<div><strong>${a.reg||'(no)'} - ${a.name||'(tanpa nama)'}</strong>
                           <div class="small">Perusahaan: ${a.company||'-'} • Izin: ${a.permit||'-'} • ${a.type} • ${a.crit} • ${statusText}${hiddenNote}${regDateText}</div></div>`;
-        
         const btns = document.createElement('div');
         const z = document.createElement('button'); z.className='btn'; z.textContent='Zoom';
         z.onclick = ()=> {
@@ -513,37 +443,32 @@
           else if(a.layer && a.layer.getLatLng){ map.setView(a.layer.getLatLng(), 18); a.layer.openPopup && a.layer.openPopup(); }
           else if(a.lat && a.lng) map.setView([a.lat,a.lng], 18);
         };
-        btns.appendChild(z);
-
-        // KODE BARU: Tombol Edit dan Hapus hanya dirender jika login sebagai Admin
-        if (KELAS_USER === "admin") {
-          const e = document.createElement('button'); e.className='btn'; e.textContent='Edit';
-          e.onclick = ()=> {
-            qs('reg').value=a.reg||''; qs('regDate').value = a.regDate || '';
-            qs('permit').value=a.permit||''; qs('name').value=a.name||'';
-            qs('company').value=a.company||'';
-            qs('location').value = a.location || '';
-            qs('workType').value = a.workType || '';
-            qs('statusPermit').value = a.statusPermit || '';
-            qs('lat').value=a.lat||''; qs('lng').value=a.lng||''; qs('type').value=a.type; qs('crit').value=a.crit; qs('radius').value=a.radius||50;
-            qs('expiry').value = a.expiry || '';
-            editingId = a.id;
-            window.scrollTo({top:0,behavior:'smooth'});
-          };
-          const d = document.createElement('button'); d.className='btn'; d.textContent='Hapus';
-          d.onclick = ()=> {
-            if(!confirm('Hapus area ini?')) return;
-            removeArea(a.id);
-          };
-          [e, d].forEach(b => { b.style.marginLeft='6px'; btns.appendChild(b); });
-        }
-
+        const e = document.createElement('button'); e.className='btn'; e.textContent='Edit';
+        e.onclick = ()=> {
+          qs('reg').value=a.reg||''; qs('regDate').value = a.regDate || '';
+          qs('permit').value=a.permit||''; qs('name').value=a.name||'';
+          qs('company').value=a.company||'';
+          qs('location').value = a.location || '';
+          qs('workType').value = a.workType || '';
+          qs('statusPermit').value = a.statusPermit || '';
+          qs('lat').value=a.lat||''; qs('lng').value=a.lng||''; qs('type').value=a.type; qs('crit').value=a.crit; qs('radius').value=a.radius||50;
+          qs('expiry').value = a.expiry || '';
+          editingId = a.id;
+          window.scrollTo({top:0,behavior:'smooth'});
+        };
+        const d = document.createElement('button'); d.className='btn'; d.textContent='Hapus';
+        d.onclick = ()=> {
+          if(!confirm('Hapus area ini?')) return;
+          removeArea(a.id);
+        };
+        [z,e,d].forEach(b=>{ b.style.marginLeft='6px'; btns.appendChild(b); });
         meta.appendChild(btns);
         div.appendChild(meta);
 
         if(a.type==='point' || a.type==='circle'){
           const p = document.createElement('div'); p.className='small'; p.style.marginTop='8px';
           p.textContent = `Lat: ${Number(a.lat).toFixed(6)} | Lng: ${Number(a.lng).toFixed(6)}${a.type==='circle' ? ' | R: '+(a.radius||50)+' m':''}`;
+          // show regDate, lokasi and expiry below
           const info = document.createElement('div'); info.className='small'; info.style.marginTop='6px';
           info.textContent = `Perusahaan: ${a.company || '-'}  •  Tanggal Registrasi: ${a.regDate || '-'}  •  Lokasi: ${a.location || '-'}  •  Status Lokasi: ${a.locationStatus || '-'}  •  Jenis Izin: ${a.workType || '-'}  •  Status Izin: ${a.statusPermit || '-'}  •  Tenggat Izin: ${a.expiry || '-'}`;
           div.appendChild(p);
@@ -561,6 +486,7 @@
     }
 
     function updateMapLayerVisibilityByFilter(){
+      // keep map layer visibility in sync based on filterStatus, search and listLocationFilter
       const filter = qs('filterStatus').value;
       const searchTerm = (qs('search').value || '').trim().toLowerCase();
       const locFilter = qs('listLocationFilter').value;
@@ -569,11 +495,13 @@
         const status = computeStatus(a.expiry);
         let visible = (filter === 'all' || filter === status);
 
+        // apply search: hide if not matching search (so map shows only visible items)
         if(visible && searchTerm){
           const combined = ((a.reg||'') + ' ' + (a.permit||'') + ' ' + (a.name||'') + ' ' + (a.company||'')).toLowerCase();
           if(!combined.includes(searchTerm)) visible = false;
         }
 
+        // apply location filter
         if(visible && locFilter && locFilter !== 'all'){
           if(locFilter === 'nodata'){
             if(a.location) visible = false;
@@ -582,8 +510,10 @@
           }
         }
 
+        // If area was hidden because expiry passed, ensure we don't re-add it
         if(a.hiddenByExpiry) visible = false;
 
+        // toggle layer
         try{
           if(a.layer){
             if(visible && !map.hasLayer(a.layer)) map.addLayer(a.layer);
@@ -593,61 +523,63 @@
       });
     }
 
-    async function removeArea(id) {
-      if (KELAS_USER !== "admin") return;
-      const { error } = await supabaseClient
-        .from('sika_Point')
-        .delete()
-        .eq('id', id);
+     async function removeArea(id) {
+  // 1. TAMBAHKAN INI: Perintah hapus ke Supabase
+  const { error } = await supabaseClient
+    .from('sika_Point')
+    .delete()
+    .eq('id', id);
 
-      if (error) {
-        console.error('Gagal hapus di Supabase:', error.message);
-        alert('Gagal menghapus data di database!');
-        return; 
-      }
+  if (error) {
+    console.error('Gagal hapus di Supabase:', error.message);
+    alert('Gagal menghapus data di database!');
+    return; // Berhenti di sini jika gagal
+  }
 
-      const idx = areas.findIndex(x => x.id === id);
-      if (idx !== -1) {
-        if (areas[idx].layer) map.removeLayer(areas[idx].layer);
-        areas.splice(idx, 1);
-      }
-      
-      saveToStorage();
-      rebuildList();
-      if (typeof updateMapLayerVisibilityByFilter === 'function') updateMapLayerVisibilityByFilter();
-      console.log('Data berhasil dihapus dari Supabase dan Web!');
-    }
-
+  // 2. Jika sukses di Supabase, baru kita hapus dari tampilan web
+  const idx = areas.findIndex(x => x.id === id);
+  if (idx !== -1) {
+    if (areas[idx].layer) map.removeLayer(areas[idx].layer);
+    areas.splice(idx, 1);
+  }
+  
+  // 3. Simpan perubahan ke memori lokal & segarkan list
+  saveToStorage();
+  rebuildList();
+  if (typeof updateMapLayerVisibilityByFilter === 'function') updateMapLayerVisibilityByFilter();
+  
+  console.log('Data berhasil dihapus dari Supabase dan Web!');
+}
     async function updateDataSupabase(id, dataPayload) {
-      if (KELAS_USER !== "admin") return;
-      const { error } = await supabaseClient
-        .from('sika_Point')
-        .update({
-          'Nomor Registrasi Area': dataPayload.reg,
-          'Nomor Registrasi Izin Kerja': dataPayload.permit,
-          'Pekerjaan': dataPayload.name,
-          'Tanggal Registrasi': dataPayload.regDate,
-          'Tanggal Kadaluarsa Izin (opsional)': dataPayload.expiry,
-          'Nama Perusahaan': dataPayload.company,
-          'Lokasi Pekerjaan': dataPayload.location,
-          'Jenis Izin Kerja': dataPayload.workType,
-          'Status Izin': dataPayload.statusPermit,
-          'Jenis Area': dataPayload.type,
-          'Kritikalitas': dataPayload.crit,
-          'Latitude': parseFloat(dataPayload.lat),
-          'Longitude': parseFloat(dataPayload.lng),
-          'Radius (meter) — untuk Lingkaran': parseInt(dataPayload.radius)
-        })
-        .eq('id', id);
+  const { error } = await supabaseClient
+    .from('sika_Point')
+    .update({
+      'Nomor Registrasi Area': dataPayload.reg,
+      'Nomor Registrasi Izin Kerja': dataPayload.permit,
+      'Pekerjaan': dataPayload.name,
+      'Tanggal Registrasi': dataPayload.regDate,
+      'Tanggal Kadaluarsa Izin (opsional)': dataPayload.expiry,
+      'Nama Perusahaan': dataPayload.company,
+      'Lokasi Pekerjaan': dataPayload.location,
+      'Jenis Izin Kerja': dataPayload.workType,
+      'Status Izin': dataPayload.statusPermit,
+      'Jenis Area': dataPayload.type,
+      'Kritikalitas': dataPayload.crit,
+      'Latitude': parseFloat(dataPayload.lat),
+      'Longitude': parseFloat(dataPayload.lng),
+      'Radius (meter) — untuk Lingkaran': parseInt(dataPayload.radius)
+    })
+    .eq('id', id);
 
-      if (error) {
-        console.error('Gagal update ke Supabase:', error.message);
-        alert('Gagal menyimpan perubahan ke database!');
-      } else {
-        console.log('Data sukses terupdate di Supabase!');
-      }
-    }
+  if (error) {
+    console.error('Gagal update ke Supabase:', error.message);
+    alert('Gagal menyimpan perubahan ke database!');
+  } else {
+    console.log('Data sukses terupdate di Supabase!');
+  }
+}
 
+    // Add area to map (and store)
     function addAreaToMap(obj, fit=true){
       const id = obj.id || String(Date.now()) + Math.random().toString(36).slice(2,8);
       let layer=null;
@@ -662,7 +594,7 @@
       } else if(obj.type==='circle'){
         layer = L.circle([obj.lat,obj.lng], { radius: obj.radius||50, color: colorForCrit(obj.crit), fillOpacity: 0.18 }).addTo(map);
         layer.bindPopup(`<b>${obj.reg||''} - ${obj.name||''}</b><br>Perusahaan: ${obj.company||'-'}<br>Izin: ${obj.permit||''}<br>${obj.crit}<br>Jenis Izin: ${workType||'-'}<br>Status Izin: ${statusPermit||'-'}<br>Expiry: ${obj.expiry||'-'}<br>Reg: ${obj.regDate||'-'}<br>Lokasi: ${loc||'-'} • ${locStatus}`);
-      } else { 
+      } else { // point
         const iconHtml = `<div style="width:22px;height:22px;border-radius:50%;background:${colorForCrit(obj.crit)};box-shadow:0 0 0 3px rgba(255,255,255,.6);border:2px solid rgba(0,0,0,.1)"></div>`;
         const icon = L.divIcon({
           className: 'custom-icon',
@@ -674,8 +606,10 @@
         layer.bindPopup(`<b>${obj.reg||''} - ${obj.name||''}</b><br>Perusahaan: ${obj.company||'-'}<br>Izin: ${obj.permit||''}<br>${obj.crit}<br>Jenis Izin: ${workType||'-'}<br>Status Izin: ${statusPermit||'-'}<br>Expiry: ${obj.expiry||'-'}<br>Reg: ${obj.regDate||'-'}<br>Lokasi: ${loc||'-'} • ${locStatus}`);
       }
 
+      // determine hiddenByExpiry at creation time
       const hiddenByExpiry = obj.expiry ? (computeStatus(obj.expiry) === 'expired') : false;
       if(hiddenByExpiry && layer && map.hasLayer(layer)){
+        // remove from map but keep the layer reference so it can be restored if expiry changed
         try{ map.removeLayer(layer); }catch(e){}
       }
 
@@ -693,11 +627,12 @@
       updateMapLayerVisibilityByFilter();
     }
 
+    // Update existing area (called when editing)
     function updateArea(id, data){
-      if (KELAS_USER !== "admin") return;
       const idx = areas.findIndex(a=>a.id===id);
       if(idx===-1) return;
       
+      // TAMBAHKAN PEMANGGILAN SUPABASE DI SINI:
       updateDataSupabase(id, data); 
 
       const old = areas[idx];
@@ -712,6 +647,7 @@
       addAreaToMap(toAdd, true);
     }
 
+    // New: hide/remove expired areas from map (but keep them in the areas array and storage)
     function pruneExpiredVisibility(){
       let changed = false;
       areas.forEach(a => {
@@ -722,11 +658,14 @@
             a.hiddenByExpiry = true;
             changed = true;
           } else if(!a.layer){
+            // nothing to do, but mark hidden for consistency
             a.hiddenByExpiry = true;
           }
         } else {
+          // if previously hidden due to expiry but now active/expiring, restore to map if it should be visible
           if(a.hiddenByExpiry){
-            a.hiddenByExpiry = false; 
+            // only re-add if map shouldn't be filtered out by user's current filters
+            a.hiddenByExpiry = false; // unset first then rely on updateMapLayerVisibilityByFilter to add if appropriate
             changed = true;
           }
         }
@@ -738,9 +677,8 @@
       }
     }
 
-    // Form handling
+    // Form handling (Disatukan langsung dengan fungsi Supabase agar tidak konflik)
     qs('addBtn').addEventListener('click', ()=>{
-      if (KELAS_USER !== "admin") return;
       const reg = qs('reg').value.trim();
       const regDate = qs('regDate').value || null;
       const permit = qs('permit').value.trim();
@@ -758,19 +696,24 @@
       const expiry = qs('expiry').value || null;
 
       if(type==='polygon'){
-        alert('Poligon harus dibuat menggunakan draw tool pada peta (pojok kiri).');
+        alert('Poligon harus dibuat menggunakan draw tool pada peta (pojok kiri). Setelah menggambar, Anda akan diminta mengisi metadata (registrasi & izin).');
         return;
       }
       if(isNaN(lat) || isNaN(lng)){
-        alert('Isi koordinat lat dan lng yang valid.');
+        alert('Isi koordinat lat dan lng yang valid (contoh: -1.234567, 117.123456).');
         return;
       }
 
+      // Bungkus data saat ini ke dalam satu objek terpadu
       const dataPayload = { reg, regDate, permit, name, company, location, locationStatus, type, crit, lat, lng, radius, expiry, workType, statusPermit };
 
       if(editingId){
+        // 1. Update ke Supabase
         updateDataSupabase(editingId, dataPayload); 
+        
+        // 2. Update tampilan lokal
         updateArea(editingId, dataPayload);
+        
         editingId = null;
         qs('addBtn').textContent = 'Tambah / Simpan';
         pruneExpiredVisibility();
@@ -779,11 +722,12 @@
 
       addAreaToMap(dataPayload);
       pruneExpiredVisibility();
+
+      // Pemicu Pengiriman Cloud ke Supabase saat Tambah Baru
       kirimKeSupabaseCloud(dataPayload);
     });
 
     qs('clearBtn').addEventListener('click', ()=>{
-      if (KELAS_USER !== "admin") return;
       if(!confirm('Hapus semua area dari peta dan storage?')) return;
       areas.forEach(a => { if(a.layer) map.removeLayer(a.layer); });
       areas = [];
@@ -792,9 +736,8 @@
       updateMapLayerVisibilityByFilter();
     });
 
-    // KODE MODIFIKASI: Klik peta hanya mengisi koordinat jika login sebagai Admin
+    // Click map to fill coords
     map.on('click', e => {
-      if (KELAS_USER !== "admin") return; 
       const { lat, lng } = e.latlng;
       qs('lat').value = lat.toFixed(6);
       qs('lng').value = lng.toFixed(6);
@@ -802,27 +745,44 @@
 
     // Handle drawn polygon
     map.on(L.Draw.Event.CREATED, function (event) {
-      if (KELAS_USER !== "admin") return;
       const layer = event.layer;
       const geojson = layer.toGeoJSON();
       const reg = prompt('Nomor Registrasi area (contoh AR-001):') || '';
       let regDate = prompt('Tanggal Registrasi (YYYY-MM-DD) — kosongkan jika tidak ada:','') || '';
       if(regDate && !/^\d{4}-\d{2}-\d{2}$/.test(regDate)){
-        alert('Format tanggal tidak valid.');
+        alert('Format tanggal registrasi tidak valid. Simpan tanpa tanggal. (gunakan YYYY-MM-DD)');
         regDate = '';
       }
       const permit = prompt('Nomor Registrasi Izin Kerja:') || '';
       const name = prompt('Nama area / pekerjaan:') || 'Poligon Area';
-      let company = prompt('Nama Perusahaan:','') || '';
+      // ask company from list (show comma separated options)
+      let company = prompt('Nama Perusahaan (mis. PT PAMITRA, PT PATRA TRADING, PT PAMITRA MEKSIP, PT PERTA MC, PT APIK, PT PATRA JASA, PT ANUGRAH ASMAT):','') || '';
       if(company) company = company.trim();
-      let location = prompt('Lokasi Pekerjaan:','') || '';
+      // ask location from the same list
+      let location = prompt('Lokasi Pekerjaan (OM, CDU, NHTU, CRU, Jetty 1, Jetty 2, Jetty 3, Open Access, Community):','') || '';
+      if(location && !['OM','CDU','NHTU','CRU','Jetty 1','Jetty 2','Jetty 3','Open Access','Community'].includes(location)){
+        const normalized = location.trim();
+        if(!['OM','CDU','NHTU','CRU','Jetty 1','Jetty 2','Jetty 3','Open Access','Community'].includes(normalized)){
+          if(!confirm('Lokasi tidak dikenali. Simpan tanpa lokasi?')) location = '';
+          else location = '';
+        } else {
+          location = normalized;
+        }
+      }
       const locationStatus = locationStatusFor(location);
       let crit = prompt('Kritikalitas (low/medium/high):', 'medium') || 'medium';
       if(!['low','medium','high'].includes(crit)) crit='medium';
-      let expiry = prompt('Tanggal kadaluarsa izin (YYYY-MM-DD):','') || '';
-
-      let workType = prompt('Jenis Izin Kerja:') || '';
-      let statusPermit = prompt('Status Izin:') || '';
+      // ask expiry for polygon
+      let expiry = prompt('Tanggal kadaluarsa izin (YYYY-MM-DD) — kosongkan jika tidak ada:','') || '';
+      if(expiry && !/^\d{4}-\d{2}-\d{2}$/.test(expiry)){
+        alert('Format tanggal tidak valid. Simpan tanpa tanggal. (gunakan YYYY-MM-DD)');
+        expiry = '';
+      }
+      // NEW: ask workType and statusPermit for polygon
+      let workType = prompt('Jenis Izin Kerja (Dingin, Panas, Ketinggian, Ruang Terbatas, Angkat Angkut, Bawah Air):','') || '';
+      if(workType) workType = workType.trim();
+      let statusPermit = prompt('Status Izin (Baru, Perpanjang 1, Perpanjang 2, Perpanjang 3):','') || '';
+      if(statusPermit) statusPermit = statusPermit.trim();
 
       layer.setStyle({ color: colorForCrit(crit) });
       layer.bindPopup(`<b>${reg} - ${name}</b><br>Perusahaan: ${company||'-'}<br>Izin: ${permit}<br>${crit}<br>Jenis Izin: ${workType||'-'}<br>Status Izin: ${statusPermit||'-'}<br>Expiry: ${expiry||'-'}<br>Reg: ${regDate||'-'}<br>Lokasi: ${location||'-'} • ${locationStatus}`);
@@ -832,11 +792,12 @@
       
       addAreaToMap(polygonPayload);
       pruneExpiredVisibility();
+
+      // Pemicu Otomatis Supabase untuk Gambar Poligon manual
       kirimKeSupabaseCloud(polygonPayload);
     });
 
     map.on('draw:deleted', function(e){
-      if (KELAS_USER !== "admin") return;
       const layers = e.layers;
       layers.eachLayer(l => {
         const gj = l.toGeoJSON();
@@ -901,19 +862,22 @@
       r.readAsText(f);
     });
 
+    // Toggle save button
     qs('toggleSave').addEventListener('click', ()=>{
-      if(confirm('Restore data dari localStorage? (OK = reload, Cancel = export JSON)')){
+      if(confirm('Restore data dari localStorage? (OK = reload untuk restore, Cancel = export current ke JSON)')){
         location.reload();
       } else {
         qs('exportJSON').click();
       }
     });
 
+    // Filter change
     qs('filterStatus').addEventListener('change', ()=>{
       updateMapLayerVisibilityByFilter();
       rebuildList();
     });
 
+    // NEW: search and list location filter listeners
     qs('search').addEventListener('input', ()=>{
       rebuildList();
       updateMapLayerVisibilityByFilter();
@@ -923,6 +887,7 @@
       updateMapLayerVisibilityByFilter();
     });
 
+    // Initial sample or load persisted
     const firstRunKey = 'monitoring_first_run_with_permit_v2';
     if(!localStorage.getItem(firstRunKey)){
       const sample = [
@@ -936,7 +901,10 @@
       loadFromStorage();
     }
 
+    // ensure expired items are removed from map on startup
     pruneExpiredVisibility();
+
+    // periodic check (every minute) to hide any areas that just expired while the app is open
     setInterval(pruneExpiredVisibility, 60*1000);
 
     rebuildList();
@@ -1011,6 +979,7 @@
 
   <script>
   (function(){
+    // Safety: try to access areas and map from outer scope
     const getAreas = ()=>{ try{ if(typeof areas !== 'undefined') return areas; }catch(e){} try{ if(window.areas) return window.areas; }catch(e){} return []; };
     const getMap = ()=> { try{ if(typeof map !== 'undefined') return map;}catch(e){} try{ if(window.map) return window.map;}catch(e){} return null; };
 
@@ -1092,13 +1061,15 @@
         if(!due) continue;
         const diff = due.getTime() - now;
 
-        if(diff <= 24*3600*1000 && diff >= 0){ 
+        if(diff <= 24*3600*1000 && diff >= 0){ // within next 24h (exclude past)
           dueItems.push({area:a, due, diff});
         }
       }
 
+      // sort by soonest
       dueItems.sort((x,y)=> x.diff - y.diff);
 
+      // render
       list.innerHTML = '';
       if(dueItems.length === 0){
         empty.textContent = 'Tidak ada pekerjaan dengan tenggat <= 24 jam.';
@@ -1118,7 +1089,7 @@
         const dueStr = it.due.toLocaleString();
         sub.innerHTML = `Perusahaan: ${a.company || '-'} • Izin: ${a.permit || '-'} • Lokasi: ${a.location || '-'} • Status Lokasi: ${a.locationStatus || '-'} • Jenis Izin: ${a.workType || '-'} • Status Izin: ${a.statusPermit || '-'} • ${a.type || '-'} • ${a.crit || '-' }<br><span style="font-weight:600">Tenggat: ${dueStr}</span>`;
         const time = document.createElement('div'); time.className='due-time'; time.textContent = formatRemaining(it.diff);
-        
+        // action: click -> zoom
         wrapper.style.cursor = 'pointer';
         wrapper.onclick = (e)=>{
           e.stopPropagation();
@@ -1151,10 +1122,16 @@
       }
     }
 
+    // initial build
     buildList();
+
+    // auto-refresh every minute to update remaining times & new data
     let intervalId = setInterval(buildList, 60*1000);
+
+    // manual refresh
     refreshBtn.addEventListener('click', ()=> buildList());
 
+    // minimize / restore
     let minimized = false;
     minimizeBtn.addEventListener('click', ()=>{
       minimized = !minimized;
@@ -1169,11 +1146,13 @@
       }
     });
 
+    // close
     closeBtn.addEventListener('click', ()=>{
       panel.style.display = 'none';
       clearInterval(intervalId);
     });
 
+    // Draggable implementation (pointer events)
     (function makeDraggable(handle, el){
       let dragging=false, startX=0, startY=0, origX=0, origY=0;
       handle.style.touchAction = 'none';
